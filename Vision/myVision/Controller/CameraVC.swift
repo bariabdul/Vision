@@ -11,11 +11,6 @@ import AVFoundation
 import CoreML
 import Vision
 
-enum FlashState {
-    case off
-    case on
-}
-
 class CameraVC: UIViewController {
     
     var captureSession: AVCaptureSession!
@@ -23,27 +18,30 @@ class CameraVC: UIViewController {
     var previewLayer: AVCaptureVideoPreviewLayer!
     
     var photoData: Data?
-
-    var flashControlState: FlashState = .off
     
     var speechSynthesizer = AVSpeechSynthesizer()
     
     @IBOutlet weak var cameraView: UIView!
     
-    @IBOutlet weak var captureImageView: UIImageView!
-    @IBOutlet weak var flashButton: UIButton!
+    @IBOutlet weak var captureImageView: RoundedShadowImageView!
     
     @IBOutlet weak var idLabel: UILabel!
     @IBOutlet weak var confidenceLabel: UILabel!
     
-    @IBOutlet weak var roundedLabelView: RoundedShadowView!
     @IBOutlet weak var spinner: UIActivityIndicatorView!
+    
+    @IBAction func alertButton(_ sender: Any) {
+        let alertController = UIAlertController(title: "Info", message: "Tap anywhere on the screen to take a picture.", preferredStyle: UIAlertControllerStyle.alert)
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alertController, animated: true, completion: nil)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        navigationItem.title = "myVision"
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -105,12 +103,6 @@ class CameraVC: UIViewController {
         
         settings.previewPhotoFormat = previewFormat
         
-        if flashControlState == .off {
-            settings.flashMode = .off
-        } else {
-            settings.flashMode = .on
-        }
-        
         cameraOutput.capturePhoto(with: settings, delegate: self)
     }
     
@@ -147,16 +139,6 @@ class CameraVC: UIViewController {
         speechSynthesizer.speak(speechUtterance)
     }
     
-    @IBAction func flashButtonPressed(_ sender: Any) {
-        switch flashControlState {
-        case .off:
-            flashButton.setTitle("FLASH ON", for: .normal)
-            flashControlState = .on
-        case .on:
-            flashButton.setTitle("FLASH OFF", for: .normal)
-            flashControlState = .off
-        }
-    }
 }
     
     extension CameraVC: AVCapturePhotoCaptureDelegate {
